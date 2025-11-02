@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark Monie 999 Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Background with Juice WRLD aesthetic */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            z-index: -2;
+        }
+        
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.05"><path fill="white" d="M28.1,36.3c-0.8,0.8-1.8,1.2-2.9,1.2s-2.1-0.4-2.9-1.2c-0.8-0.8-1.2-1.8-1.2-2.9s0.4-2.1,1.2-2.9c0.8-0.8,1.8-1.2,2.9-1.2 s2.1,0.4,2.9,1.2c0.8,0.8,1.2,1.8,1.2,2.9S28.9,35.5,28.1,36.3z M50,12.5c-20.7,0-37.5,16.8-37.5,37.5S29.3,87.5,50,87.5 S87.5,70.7,87.5,50S70.7,12.5,50,12.5z M50,78.1c-15.5,0-28.1-12.6-28.1-28.1c0-15.5,12.6-28.1,28.1-28.1c15.5,0,28.1,12.6,28.1,28.1 C78.1,65.5,65.5,78.1,50,78.1z"/></svg>');
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .juicewrld-text {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+            z-index: -1;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .calendar-wrapper {
+            background: rgba(20, 20, 35, 0.85);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 3;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .calendar {
+            padding: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .calendar-header h2 {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            color: #6a11cb;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px 0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        
+        .day {
+            height: 45px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 5px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .day:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .day.current {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .day.other-month {
+            color: #666;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
+        
+        .event-indicator {
+            width: 4px;
+            height: 4px;
+            background-color: #ff6bcb;
+            border-radius: 50%;
+            margin-top: auto;
+            align-self: center;
+            z-index: 2;
+        }
+        
+        .money-event {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 0.7rem;
+            color: #6a11cb;
+            z-index: 2;
+        }
+        
+        .sidebar {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar h3 {
+            color: #6a11cb;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .sidebar h3 i {
+            color: #2575fc;
+        }
+        
+        .event-list {
+            list-style-type: none;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .event-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #6a11cb;
+            transition: all 0.3s;
+        }
+        
+        .event-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .event-time {
+            font-weight: bold;
+            color: #2575fc;
+            font-size: 0.8rem;
+        }
+        
+        .event-title {
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .add-event {
+            margin-top: 15px;
+        }
+        
+        .add-event h3 {
+            color: #6a11cb;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .add-event input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: white;
+        }
+        
+        .add-event input:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+        }
+        
+        .add-event input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .add-event button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-event button:hover {
+            background: linear-gradient(135deg, #5a0db5 0%, #1c68e6 100%);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 3;
+            background: rgba(10, 10, 20, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px rgba(106, 17, 203, 0.7);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .calendar-wrapper {
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .calendar {
+                padding: 15px;
+            }
+            
+            .day {
+                height: 40px;
+                padding: 5px 3px;
+            }
+            
+            .day-number {
+                font-size: 0.8rem;
+            }
+            
+            .sidebar {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="background-overlay"></div>
+    <div class="juicewrld-text">Juice WRLD 999 Vibes</div>
+    
+    <div class="container">
+        <div class="calendar-wrapper">
+            <header class="header">
+                <h1 class="glow">SPARK MONIE 999</h1>
+                <p class="subtitle">Financial Goals & Money Mindset</p>
+                <div class="logo-container">
+                    <div class="logo-circle pulse">$</div>
+                    <div class="logo-circle pulse">9</div>
+                    <div class="logo-circle pulse">9</div>
+                    <div class="logo-circle pulse">9</div>
+                </div>
+            </header>
+            
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button class="nav-btn" id="prev-month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <h2 id="current-month">Month Year</h2>
+                    <button class="nav-btn" id="next-month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                
+                <div class="days" id="calendar-days">
+                    <!-- Days will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <h3><i class="fas fa-money-bill-wave"></i> Today's Financial Tasks</h3>
+                <ul class="event-list" id="event-list">
+                    <!-- Events will be populated by JavaScript -->
+                </ul>
+                
+                <div class="add-event">
+                    <h3><i class="fas fa-plus-circle"></i> Add Money Goal</h3>
+                    <input type="text" id="event-title" placeholder="Financial task or goal">
+                    <input type="date" id="event-date">
+                    <button id="add-event-btn">
+                        <i class="fas fa-calendar-plus"></i> Add Goal
+                    </button>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Spark Monie 999 • Financial Freedom • Juice WRLD Vibes</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current date
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        
+        // Sample events data with financial/money themes
+        let events = [
+            { title: "Review Budget", date: new Date(currentYear, currentMonth, 5), id: 1 },
+            { title: "Pay Bills", date: new Date(currentYear, currentMonth, 12), id: 2 },
+            { title: "Investment Research", date: new Date(currentYear, currentMonth, 18), id: 3 },
+            { title: "Side Hustle Day", date: new Date(currentYear, currentMonth, 22), id: 4 },
+            { title: "Savings Transfer", date: new Date(currentYear, currentMonth, 25), id: 5 },
+            { title: "Financial Planning", date: new Date(currentYear, currentMonth, 28), id: 6 },
+            { title: "Track Expenses", date: new Date(currentYear, currentMonth, 8), id: 7 },
+            { title: "Money Mindset", date: new Date(currentYear, currentMonth, 15), id: 8 }
+        ];
+        
+        // DOM elements
+        const currentMonthElement = document.getElementById('current-month');
+        const calendarDaysElement = document.getElementById('calendar-days');
+        const prevMonthButton = document.getElementById('prev-month');
+        const nextMonthButton = document.getElementById('next-month');
+        const eventListElement = document.getElementById('event-list');
+        const addEventButton = document.getElementById('add-event-btn');
+        const eventTitleInput = document.getElementById('event-title');
+        const eventDateInput = document.getElementById('event-date');
+        
+        // Set today's date as default for new events
+        eventDateInput.valueAsDate = new Date();
+        
+        // Month names
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        
+        // Money-themed event types
+        const moneyEvents = ["budget", "bill", "investment", "savings", "financial", "money", "hustle"];
+        
+        // Render calendar
+        function renderCalendar() {
+            // Update current month display
+            currentMonthElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            
+            // Clear previous days
+            calendarDaysElement.innerHTML = '';
+            
+            // Get first day of month and number of days in month
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            // Previous month days
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = 0; i < startingDay; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day other-month';
+                dayElement.innerHTML = `
+                    <div class="day-number">${prevMonthLastDay - startingDay + i + 1}</div>
+                `;
+                calendarDaysElement.appendChild(dayElement);
+            }
+            
+            // Current month days
+            const today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                const dayDate = new Date(currentYear, currentMonth, i);
+                
+                // Check if this day has events
+                const dayEvents = events.filter(event => 
+                    event.date.getDate() === i && 
+                    event.date.getMonth() === currentMonth && 
+                    event.date.getFullYear() === currentYear
+                );
+                
+                // Check if this is today
+                const isToday = today.getDate() === i && 
+                               today.getMonth() === currentMonth && 
+                               today.getFullYear() === currentYear;
+                
+                dayElement.className = `day ${isToday ? 'current' : ''}`;
+                
+                // Check if any events are money-themed
+                const hasMoneyEvent = dayEvents.some(event => 
+                    moneyEvents.some(moneyEvent => 
+                        event.title.toLowerCase().includes(moneyEvent)
+                    )
+                );
+                
+                dayElement.innerHTML = `
+                    <div class="day-number">${i}</div>
+                    ${dayEvents.length > 0 ? '<div class="event-indicator"></div>' : ''}
+                    ${hasMoneyEvent ? '<div class="money-event"><i class="fas fa-dollar-sign"></i></div>' : ''}
+                `;
+                
+                // Add click event to show events for this day
+                dayElement.addEventListener('click', () => {
+                    showEventsForDay(dayDate);
+                });
+                
+                calendarDaysElement.appendChild(dayElement);
+            }
+            
+            // Next month days
+            const totalCells = 42; // 6 rows x 7 columns
+            const remainingCells = totalCells - (startingDay + daysInMonth);
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day other-month';
+                dayElement.innerHTML = `
+                    <div class="day-number">${i}</div>
+                `;
+                calendarDaysElement.appendChild(dayElement);
+            }
+            
+            // Update today's events
+            updateTodayEvents();
+        }
+        
+        // Show events for a specific day
+        function showEventsForDay(date) {
+            const dayEvents = events.filter(event => 
+                event.date.getDate() === date.getDate() && 
+                event.date.getMonth() === date.getMonth() && 
+                event.date.getFullYear() === date.getFullYear()
+            );
+            
+            eventListElement.innerHTML = '';
+            
+            if (dayEvents.length === 0) {
+                eventListElement.innerHTML = '<li class="event-item">No financial tasks today. Time to set new goals!</li>';
+                return;
+            }
+            
+            dayEvents.forEach(event => {
+                const eventItem = document.createElement('li');
+                eventItem.className = 'event-item';
+                
+                // Add money icon for money-themed events
+                const isMoneyEvent = moneyEvents.some(moneyEvent => 
+                    event.title.toLowerCase().includes(moneyEvent)
+                );
+                
+                const moneyIcon = isMoneyEvent ? '<i class="fas fa-dollar-sign"></i> ' : '<i class="fas fa-calendar-check"></i> ';
+                
+                eventItem.innerHTML = `
+                    <div class="event-time">${formatTime(event.date)}</div>
+                    <div class="event-title">${moneyIcon}${event.title}</div>
+                `;
+                eventListElement.appendChild(eventItem);
+            });
+        }
+        
+        // Update today's events in the sidebar
+        function updateTodayEvents() {
+            const today = new Date();
+            const todayEvents = events.filter(event => 
+                event.date.getDate() === today.getDate() && 
+                event.date.getMonth() === today.getMonth() && 
+                event.date.getFullYear() === today.getFullYear()
+            );
+            
+            eventListElement.innerHTML = '';
+            
+            if (todayEvents.length === 0) {
+                eventListElement.innerHTML = '<li class="event-item">No financial tasks today. Focus on your money mindset!</li>';
+                return;
+            }
+            
+            todayEvents.forEach(event => {
+                const eventItem = document.createElement('li');
+                eventItem.className = 'event-item';
+                
+                // Add money icon for money-themed events
+                const isMoneyEvent = moneyEvents.some(moneyEvent => 
+                    event.title.toLowerCase().includes(moneyEvent)
+                );
+                
+                const moneyIcon = isMoneyEvent ? '<i class="fas fa-dollar-sign"></i> ' : '<i class="fas fa-calendar-check"></i> ';
+                
+                eventItem.innerHTML = `
+                    <div class="event-time">${formatTime(event.date)}</div>
+                    <div class="event-title">${moneyIcon}${event.title}</div>
+                `;
+                eventListElement.appendChild(eventItem);
+            });
+        }
+        
+        // Format time for display
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Event listeners for navigation
+        prevMonthButton.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        nextMonthButton.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+        
+        // Add new event
+        addEventButton.addEventListener('click', () => {
+            const title = eventTitleInput.value.trim();
+            const date = new Date(eventDateInput.value);
+            
+            if (!title) {
+                alert('Please enter a financial goal or task');
+                return;
+            }
+            
+            if (!eventDateInput.value) {
+                alert('Please select a date');
+                return;
+            }
+            
+            // Add event
+            events.push({
+                title,
+                date,
+                id: Date.now() // Simple unique ID
+            });
+            
+            // Clear inputs
+            eventTitleInput.value = '';
+            eventDateInput.valueAsDate = new Date();
+            
+            // Update calendar
+            renderCalendar();
+            
+            // Show confirmation
+            alert('Financial goal added successfully!');
+        });
+        
+        // Initial render
+        renderCalendar();
+    </script>
+</body>
+</html>v
